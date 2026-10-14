@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI-Era Backend Engineering Interview Workbook</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top"><div class="topinner"><div class="brand">BACKEND INTERVIEW LAB <small>AI-era engineering workbook</small></div><div class="topactions"><button class="btn" id="expandAll">Expand all</button><button class="btn" id="collapseAll">Collapse all</button><button class="btn" id="themeBtn">☾ Theme</button><button class="btn" onclick="window.print()">Print / PDF</button></div></div></header>
+<div class="layout">
+<aside class="sidebar">
+<div class="sidehead">Navigate the workbook</div>
+<a class="navlink" href="#start">Start here</a><a class="navlink" href="#deployment">Deployment & ownership</a><a class="navlink" href="#gitlab">GitLab, branches & CI/CD</a><a class="navlink" href="#versioning">Versioning & releases</a><a class="navlink" href="#ai-tools">AI coding modes</a><a class="navlink" href="#context">Context & hallucinations</a><a class="navlink" href="#workflow">Safe AI workflow</a><a class="navlink" href="#scenarios">Scenario interview bank</a><a class="navlink" href="#project-audit">Audit your current project</a><a class="navlink" href="#mock">Mock interview</a><a class="navlink" href="#sources">Official references</a>
+<div class="progressbox"><div style="display:flex;justify-content:space-between;gap:8px"><strong style="font-size:13px">Knowledge progress</strong><span id="progressText" class="muted" style="font-size:12px">0%</span></div><div class="progressline"><div class="progressfill" id="progressFill"></div></div><div class="muted" style="font-size:12px"><span id="completedCount">0</span> of <span id="totalCount">0</span> questions marked understood</div><button class="btn" style="width:100%;margin-top:10px" id="resetProgress">Reset progress</button></div>
+</aside>
+<main>
+<section id="start" class="hero">
+<div class="eyebrow">Practical interview preparation · Updated 14 October 2026</div>
+<h1>Be the engineer who understands how code reaches production—and how AI changes the job.</h1>
+<p>This workbook follows the interview themes in your transcript: deployment choices, the developer's responsibility, GitLab and branching, release versioning, AI coding modes, context windows, hallucinations, and safe engineering judgement.</p>
+<div class="chips"><span class="chip">9 learning modules</span><span class="chip">20+ practice questions</span><span class="chip">Search & filters</span><span class="chip">Progress tracking</span><span class="chip">Mock interview</span></div>
+<div class="callout"><strong>The rule to remember:</strong> don't claim that you own deployment if you don't. Know the real workflow, identify what you personally do, explain your handoffs, and say what you would verify before and after release. Honest operational understanding beats rehearsed buzzwords.</div>
+</section>
+<section class="section"><div class="grid3">
+<div class="card"><div class="tag">01 · Understand</div><h3>Explain the real path</h3><p>Commit → review → build → test → package → deploy → smoke test → monitor → rollback if necessary.</p></div>
+<div class="card"><div class="tag">02 · Verify</div><h3>Don't trust AI output blindly</h3><p>Check diffs, repository conventions, tests, security, database behaviour, resource use, and operational impact.</p></div>
+<div class="card"><div class="tag">03 · Own your slice</div><h3>Be precise about contribution</h3><p>Separate what you did, what DevOps did, what you reviewed, and what you merely understand conceptually.</p></div>
+</div></section>
+<section class="section" id="deployment"><div class="sectionhead"><div><div class="kicker">Module 1</div><h2>Deployment strategy & developer ownership</h2><p class="muted">Know the options, their trade-offs, and what your team actually does.</p></div></div>
+<div class="grid2">
+<div class="card"><h3>What is a deployment strategy?</h3><p>A deployment strategy defines <strong>how a new application version is introduced to an environment and its users</strong>, including availability, risk, validation, traffic shifting, and recovery.</p><div class="callout2 good"><strong>Interview shape:</strong> name the strategy → describe the mechanics → state the benefit → state the trade-off → explain where it fits.</div><p>Deployment strategy is not the same thing as release strategy. Deployment changes the running software; release controls when a capability becomes available to users. Feature flags can decouple the two.</p></div>
+<div class="card"><h3>What is a developer's role if DevOps deploys?</h3><p>DevOps/SRE/platform teams may own pipeline infrastructure and production access. Developers still help make the change deployable and safe.</p><ul><li>Understand build artifacts, config, dependencies, and required migrations.</li><li>Ensure tests and quality gates pass; review pipeline output and release notes.</li><li>Coordinate approvals, deployment windows, feature flags, and backward compatibility.</li><li>Run or support smoke tests, watch logs/metrics, investigate regressions, and help rollback.</li></ul><div class="callout2 warning"><strong>Don't bluff:</strong> describe only the steps you personally perform, then explain the larger process you have studied or observed.</div></div>
+</div>
+<h3 style="margin-top:18px">Compare common deployment approaches</h3>
+<div class="tablewrap"><table><thead><tr><th>Strategy</th><th>How it works</th><th>Strength</th><th>Risk / cost</th><th>Good interview point</th></tr></thead><tbody>
+<tr><td><strong>Recreate / stop-start</strong></td><td>Stop old version; start new one.</td><td>Simple and inexpensive.</td><td>Downtime; rollback may take time.</td><td>Can fit internal or non-critical apps where downtime is acceptable.</td></tr>
+<tr><td><strong>Rolling</strong></td><td>Replace instances/pods gradually.</td><td>Usually no full outage; resource-efficient.</td><td>Old/new versions coexist; compatibility and capacity matter.</td><td>Health checks, readiness, and backward-compatible APIs are important.</td></tr>
+<tr><td><strong>Blue-green</strong></td><td>Maintain two environments; route traffic from old to new after validation.</td><td>Fast switch and relatively simple traffic rollback.</td><td>Extra infrastructure; database changes can prevent easy rollback.</td><td>Rollback is often traffic switching, but schema/data rollback is a separate problem.</td></tr>
+<tr><td><strong>Canary</strong></td><td>Send a small share of traffic to the new version, then expand gradually.</td><td>Limits blast radius and tests with real traffic.</td><td>Needs traffic routing, meaningful metrics, and enough traffic to detect issues.</td><td>Define promotion/abort metrics, e.g. error rate and latency.</td></tr>
+<tr><td><strong>Feature flags</strong></td><td>Deploy code while keeping a capability disabled or selectively enabled.</td><td>Separates deployment from exposure; staged rollout.</td><td>Flag combinations and old flags create complexity.</td><td>Flags do not replace testing or safe deployment; plan flag cleanup.</td></tr>
+</tbody></table></div>
+<div class="callout2"><strong>Question:</strong> “Which deployment strategy do you use?” First learn what your current project really uses. If the pipeline simply deploys an artifact to a server after a manual approval, don't call it canary or blue-green unless traffic/environment mechanics confirm that.</div>
+<div class="kicker" style="margin-top:22px">Expand to study</div>
+<div id="deploymentQs" class="questions"></div>
+</section>
+<section class="section" id="gitlab"><div class="kicker">Module 2</div><h2>GitLab, branches, merge requests & CI/CD</h2><p class="muted">An interviewer wants to know how your change moves safely through a team—not whether you can recite Git commands.</p>
+<div class="grid2"><div class="card"><h3>Typical path</h3><pre>issue / task
+  ↓
+feature branch
+  ↓
+commit + push
+  ↓
+merge request (MR)
+  ↓
+review + automated checks
+  ↓
+merge to main / release branch
+  ↓
+build artifact + publish
+  ↓
+staging / UAT checks
+  ↓
+approved production deployment
+  ↓
+smoke test + monitoring</pre><p class="notice">This is a common pattern, not a mandatory GitLab workflow. Your team may use different branch names, environments, approvals, or release gates.</p></div><div class="card"><h3>Branch roles (common conventions)</h3><ul><li><span class="inlinecode">main</span>: canonical stable branch; production-ready in many teams.</li><li><span class="inlinecode">feature/*</span>: isolated feature or task work.</li><li><span class="inlinecode">bugfix/*</span>: correction to existing behaviour.</li><li><span class="inlinecode">release/*</span>: optional stabilization branch for a planned release.</li><li><span class="inlinecode">hotfix/*</span>: urgent production fix, usually based on the released production version.</li><li><span class="inlinecode">develop</span>: integration branch in some Git Flow-style teams; not universal.</li></ul><div class="callout2 warning">A branch named <span class="inlinecode">uat</span> or <span class="inlinecode">prod</span> is a team convention—not a GitLab requirement. Many web-service teams deploy the same commit or artifact through environments instead.</div></div></div>
+<h3 style="margin-top:18px">GitLab vocabulary you should be able to explain</h3>
+<div class="grid3"><div class="card"><h3>Branch</h3><p>A movable reference to a line of development. It is not itself a release or deployed environment.</p></div><div class="card"><h3>Commit</h3><p>A recorded snapshot/change in repository history, identified by a hash.</p></div><div class="card"><h3>Merge request</h3><p>A review and collaboration mechanism for discussion, approvals, and checks before merging.</p></div><div class="card"><h3>Pipeline</h3><p>Jobs and stages automated by CI/CD configuration, for example build, test, scan, package, deploy.</p></div><div class="card"><h3>Artifact</h3><p>A build output, such as a JAR or container image, that downstream jobs can use.</p></div><div class="card"><h3>Environment</h3><p>A deployment target such as development, staging, UAT, or production, tracked in GitLab where configured.</p></div></div>
+<div id="gitQs" class="questions"></div>
+</section>
+<section class="section" id="versioning"><div class="kicker">Module 3</div><h2>Versioning, tags, releases & rollback</h2><div class="grid2"><div class="card"><h3>Semantic Versioning</h3><p>For a public API/library that follows SemVer, the familiar format is <strong>MAJOR.MINOR.PATCH</strong>.</p><ul><li><strong>Major:</strong> incompatible public API change.</li><li><strong>Minor:</strong> backward-compatible functionality.</li><li><strong>Patch:</strong> backward-compatible bug fix.</li></ul><pre>1.4.2 → 1.4.3  bug fix
+1.4.3 → 1.5.0  compatible feature
+1.5.0 → 2.0.0  breaking change</pre><p class="notice">A team's internal application build number may follow different rules. Don't claim every commit increments a semantic version.</p></div><div class="card"><h3>Tag vs release vs branch</h3><ul><li><strong>Branch:</strong> moves as new commits are added.</li><li><strong>Tag:</strong> names a specific commit; release tags often use annotated tags.</li><li><strong>Release:</strong> a published release record with a version, notes, and often links/artifacts.</li><li><strong>Build number:</strong> identifies a pipeline/build run; not always the user-facing product version.</li><li><strong>Artifact/image tag:</strong> version or commit identifier used to find the exact built output.</li></ul><div class="callout2 good">A strong release process can answer: “Exactly which commit, artifact, config, and database state are in production?”</div></div></div>
+<div id="versionQs" class="questions"></div>
+</section>
+<section class="section" id="ai-tools"><div class="kicker">Module 4</div><h2>Using Copilot, Cursor & AI coding modes</h2><p>Interviewers increasingly ask not just which AI product you use, but how you select its mode, provide context, review changes, and control risk. Labels and capabilities can vary by editor, release, plan, and policy—explain what your own IDE actually shows.</p>
+<div class="tablewrap"><table><thead><tr><th>Mode / workflow</th><th>Best use</th><th>Risk control</th></tr></thead><tbody>
+<tr><td><strong>Ask / Chat</strong></td><td>Understand an unfamiliar service, explain a method, compare approaches, ask for likely impact. Prefer read-only exploration first.</td><td>Ask for file paths and evidence; check answers against source.</td></tr>
+<tr><td><strong>Plan</strong></td><td>Multi-step feature, cross-service change, schema migration, risky refactor.</td><td>Review the plan before implementation; check assumptions, dependencies, edge cases, and rollback.</td></tr>
+<tr><td><strong>Edit</strong></td><td>Targeted edits to selected files or known code regions.</td><td>Keep scope small and review each diff.</td></tr>
+<tr><td><strong>Agent</strong></td><td>Task involving repository search, multiple-file changes, commands, tests, and iterative fixes.</td><td>Limit permissions; inspect commands and diffs; don't accept “tests passed” without seeing what ran.</td></tr>
+<tr><td><strong>Debug</strong></td><td>Investigate a reproducible issue using logs, traces, tests, and runtime evidence.</td><td>Require evidence and reproduction; avoid speculative code changes before narrowing the cause.</td></tr>
+<tr><td><strong>Inline / autocomplete</strong></td><td>Small local code completion or refactor in a specific region.</td><td>Check surrounding invariants, null handling, exceptions, transactions, and conventions.</td></tr>
+</tbody></table></div>
+<div class="callout2">Current docs make a similar distinction: GitHub Copilot documentation describes Ask, Plan, and Agent workflows (and Edit in certain Copilot Edits experiences); Cursor documents Ask, Agent, and configurable modes, with Plan/Debug available in some current workflows. Treat this as a mental model, not a promise that every app/IDE has identical buttons.</div>
+<h3 style="margin-top:18px">A better way to prompt an AI coding assistant</h3>
+<div class="card"><span class="tag">Copy-ready prompt template</span><pre id="promptTemplate">First inspect the existing implementation; do not edit code yet.
+
+Goal: [state the behaviour to change]
+Relevant paths: [service/controller/repository/tests/config]
+Constraints: Preserve API contracts, authorization, transaction boundaries,
+logging conventions, backward compatibility, and existing architecture.
+
+Please report:
+1. Current flow with file paths and important methods.
+2. Proposed minimal change and alternatives considered.
+3. Failure cases, concurrency risks, DB/query impact, and security risks.
+4. Tests to add or update.
+5. Deployment/configuration implications and rollback considerations.
+
+Wait for my approval before making changes.</pre><button class="btn" id="copyPrompt">Copy prompt</button><span id="copyState" class="notice"></span></div>
+<div id="aiQs" class="questions"></div>
+</section>
+<section class="section" id="context"><div class="kicker">Module 5</div><h2>Context windows, retrieval & hallucinations</h2><div class="grid2"><div class="card"><h3>What is a context window?</h3><p>The model's working token budget for the current interaction. It can include your prompt, chat history, code snippets, retrieved files, tool output, and room for generated output.</p><p><strong>Important:</strong> opening a repository in an AI IDE does not mean the model has read every file. The tool may index/search the codebase and select relevant pieces; irrelevant or missing context can change the answer.</p><div class="callout2">More context is not always better. A smaller, relevant set of files and a clear goal can outperform pasting a huge repository dump.</div></div><div class="card"><h3>What is hallucination?</h3><p>A model produces confident-sounding but false or unsupported content. In coding, that can mean inventing a class, method, configuration key, framework behaviour, API field, or test result.</p><p>Why it happens: generative models predict plausible continuations; they don't guarantee factual verification. Missing context, ambiguous prompts, uncommon APIs, stale knowledge, and pressure to provide a complete answer can contribute.</p><p class="notice">NIST uses “confabulation” for confidently stated but erroneous or false generated content—commonly called hallucination.</p></div></div>
+<h3 style="margin-top:18px">How to reduce risk in practice</h3>
+<div class="grid3"><div class="card"><h3>Ground the answer</h3><p>Give relevant files, exact logs, API contracts, schema, framework version, and reproducible steps.</p></div><div class="card"><h3>Ask for evidence</h3><p>Request real file paths, method names, specific assumptions, and the source of each key claim.</p></div><div class="card"><h3>Verify independently</h3><p>Compile, test, inspect diffs, check official docs, examine DB plans, and run safe benchmarks.</p></div></div>
+<div id="contextQs" class="questions"></div>
+</section>
+<section class="section" id="workflow"><div class="kicker">Module 6</div><h2>A safe, repeatable AI-assisted engineering workflow</h2><p>A practical process for using AI without outsourcing engineering judgement.</p>
+<div class="grid2"><div class="card"><h3>Before asking AI to code</h3><ol><li>Understand the bug/requirement and success criteria.</li><li>Trace the current flow through controller, service, repository, integrations, config, and tests.</li><li>Provide relevant files, versions, logs, and constraints.</li><li>Ask for a plan and failure modes before broad edits.</li></ol></div><div class="card"><h3>Before accepting the result</h3><ol><li>Read every changed line and understand why it changed.</li><li>Build and run relevant tests; verify test coverage is meaningful.</li><li>Inspect exception handling, auth, validation, transactions, retries, timeouts, and resource limits.</li><li>Check SQL/query count, latency implications, backward compatibility, and deployment requirements.</li><li>Review diff, commit cleanly, and be able to explain the design in a code review.</li></ol></div></div>
+<div class="callout2 warning"><strong>Never paste</strong> production secrets, customer personal data, credentials, private keys, or restricted code into an AI tool unless your organization's approved policy explicitly permits that use. Follow team rules for data retention, privacy, and model access.</div>
+<h3 style="margin-top:18px">Use AI to challenge the change, not just write it</h3><div class="card"><pre>Review this diff as a skeptical senior engineer. Do not rewrite it yet.
+Look for:
+- correctness and backward compatibility
+- race conditions and data consistency
+- transaction/rollback behaviour
+- N+1 queries, connection-pool pressure, memory/CPU costs
+- timeout/retry amplification and duplicate side effects
+- authentication, authorization, injection, and sensitive logging
+- missing tests and observability
+For every concern, point to a changed line and explain how to reproduce or test it.
+Separate confirmed defects from hypotheses.</pre></div>
+</section>
+<section class="section" id="scenarios"><div class="kicker">Module 7</div><h2>Scenario-based interview question bank</h2><p>Search the questions and filter by topic. Open each card for a model answer and a “what the interviewer is checking” note. Answers are reference patterns: adapt them to what actually happens in your project.</p>
+<div class="searchbar"><input id="searchInput" type="search" placeholder="Search e.g. rollback, AI context, hotfix…" aria-label="Search questions"><select id="topicFilter" aria-label="Filter questions by topic"><option value="all">All topics</option><option>Deployment</option><option>GitLab / CI/CD</option><option>Versioning</option><option>AI coding</option><option>Architecture / operations</option></select><button class="btn" id="clearSearch">Clear</button></div>
+<div id="scenarioQs" class="questions"></div><p class="notice" id="noResults" hidden>No matching questions. Try another keyword or topic.</p>
+</section>
+<section class="section" id="project-audit"><div class="kicker">Module 8</div><h2>Current-project audit checklist</h2><p>Fill this out from your actual repository, pipeline, runbooks, and teammates. An interviewer may ask follow-ups that expose whether you understand the real process, so don't answer from assumptions.</p>
+<div class="card"><div class="checklist" id="auditChecklist"></div><div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn primary" id="exportAudit">Export my checklist</button><button class="btn" id="clearAudit">Reset checklist</button></div><p id="auditStatus" class="notice"></p></div>
+<h3 style="margin-top:18px">A credible way to describe limited deployment ownership</h3><div class="card"><p><strong>Use your own facts, but follow this structure:</strong></p><blockquote>“In my current project, the DevOps/platform team owns [accurate portion of pipeline or production access]. My contribution is [specific actual responsibilities, such as preparing the change, ensuring tests pass, reviewing logs, coordinating UAT, validating endpoints, or supporting production verification]. I understand the release flow from [actual trigger] through [actual gates] to [actual deployment mechanism]. After deployment, we validate [specific health checks] and if [specific failure condition] occurs, our rollback/recovery approach is [known procedure]. I haven't personally owned [thing you haven't done], so I wouldn't claim that—but I know where my team's responsibility begins and ends.”</blockquote><p class="notice">Don't memorise this with invented details. Replace every bracket with evidence from your own system.</p></div>
+</section>
+<section class="section" id="mock"><div class="kicker">Module 9</div><h2>Mock interview mode</h2><p>Try answering out loud in 60–90 seconds before revealing the model answer. Use “next question” to practise under light pressure.</p>
+<div class="quizbox"><div class="quiztop"><span id="quizTopic">DEPLOYMENT</span><span id="quizCount">Question 1</span></div><div class="quizq" id="quizQuestion"></div><div class="notice">Practice structure: definition → how your project works → trade-off → your contribution → verification/rollback.</div><div class="answer" id="quizAnswer"></div><div class="quizcontrols"><button class="btn primary" id="revealAnswer">Reveal answer outline</button><button class="btn" id="nextQuestion">Next question →</button><button class="btn" id="shuffleQuiz">Shuffle questions</button></div></div>
+</section>
+<section class="section" id="sources"><div class="kicker">Module 10</div><h2>References to keep current</h2><p class="muted">Tool UIs and documentation change. Use official docs to confirm the exact names and features in the IDE/version you use.</p>
+<div class="card">
+<div class="sourceitem"><a href="https://docs.gitlab.com/user/project/repository/branches/strategies/" target="_blank" rel="noopener">GitLab: Branching strategies</a><p class="muted">Common web-service, long-lived release-branch, and branch-per-environment patterns.</p></div>
+<div class="sourceitem"><a href="https://docs.gitlab.com/ci/environments/deployments/" target="_blank" rel="noopener">GitLab: Deployments and environments</a><p class="muted">Deployment history, environments, manual deployment jobs, and release tracking.</p></div>
+<div class="sourceitem"><a href="https://docs.gitlab.com/user/project/canary_deployments/" target="_blank" rel="noopener">GitLab: Canary deployments</a><p class="muted">Gradually directing a portion of traffic to a new version.</p></div>
+<div class="sourceitem"><a href="https://docs.gitlab.com/ci/environments/incremental_rollouts/" target="_blank" rel="noopener">GitLab: Incremental rollouts and blue-green</a><p class="muted">Timed rollout patterns and parallel blue/green environments.</p></div>
+<div class="sourceitem"><a href="https://docs.gitlab.com/user/project/repository/tags/" target="_blank" rel="noopener">GitLab: Git tags</a><p class="muted">Lightweight and annotated tags, and using tags to trigger automation.</p></div>
+<div class="sourceitem"><a href="https://docs.gitlab.com/user/project/releases/release_fields/" target="_blank" rel="noopener">GitLab: Release fields and version tag names</a><p class="muted">Version tags and release notes.</p></div>
+<div class="sourceitem"><a href="https://docs.github.com/en/copilot/how-tos/chat-with-copilot/chat-in-ide?tool=vscode" target="_blank" rel="noopener">GitHub Copilot: Chat modes in the IDE</a><p class="muted">Ask and Agent workflows and current IDE mode guidance.</p></div>
+<div class="sourceitem"><a href="https://docs.cursor.com/en/agent/modes" target="_blank" rel="noopener">Cursor: Agent modes</a><p class="muted">Mode overview; capabilities can differ by current product version.</p></div>
+<div class="sourceitem"><a href="https://docs.cursor.com/en/guides/working-with-context" target="_blank" rel="noopener">Cursor: Working with context</a><p class="muted">How relevant code, files, and session information are supplied as model context.</p></div>
+<div class="sourceitem"><a href="https://docs.cursor.com/context/%40-symbols/overview" target="_blank" rel="noopener">Cursor: Explicitly referencing files and code</a><p class="muted">Ways to attach source files, folders, docs, and other context.</p></div>
+<div class="sourceitem"><a href="https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf" target="_blank" rel="noopener">NIST: Generative AI Profile</a><p class="muted">Risk vocabulary including confabulation, commonly called hallucination.</p></div>
+</div><div class="foot">Created as a practical study workbook from the transcript you provided, with current official references. Interview answers are templates for learning, not claims about your own system. Mark questions understood only when you can explain them and connect them to real project evidence.</div></section>
+</main></div>
+<script src="app.js" defer></script>
+</body></html>
